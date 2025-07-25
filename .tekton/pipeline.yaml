@@ -77,5 +77,67 @@ spec:
       - name: revision
         value: "main"
       - name: pathInRepo
-        # This path points to the remote rpmbuild TASK file.
         value: "task/rpmbuild.yaml"
+---
+apiVersion: tekton.dev/v1
+kind: Task
+metadata:
+  name: buildah-from-containerfile
+spec:
+  params:
+  - name: image
+    description: The URL of the image to build and push.
+  - name: context
+    description: The path to the build context.
+    default: "."
+  workspaces:
+  - name: source
+  results:
+  - name: IMAGE_URL
+    description: The URL of the pushed image.
+  - name: IMAGE_DIGEST
+    description: The digest of the pushed image.
+  steps:
+  - name: build-and-push
+    image: quay.io/buildah/stable:v1.33
+    workingDir: $(workspaces.source.path)
+    script: |
+      buildah bud \
+        -t "$(params.image)" \
+        -f "$(params.context)/Dockerfile" "$(params.context)"
+      
+      buildah push \
+        --digestfile "$(results.IMAGE_DIGEST.path)" \
+        "$(params.image)" \
+        "docker://$(params.image)"
+      
+      echo -n "$(params.image)" | tee "$(results.IMAGE_URL.path)"
+---
+apiVersion: tekton.dev/v1
+kind: Task
+metadata:
+  name: generate-spec-file
+spec:
+  description: This task runs a preparation script inside a custom tool image
+    to generate a final .spec file.
+  params:
+  - name: TOOL_IMAGE
+    description: The URL of the tool image to use for generating the .spec file.
+  - name: PATH_CONTEXT
+    description: The path to the working directory.
+    default: "."
+  workspaces:
+  - name: source
+    description: A workspace containing the source code.
+  steps:
+  - name: generate-spec
+    image: $(params.TOOL_IMAGE)
+    workingDir: $(workspaces.source.path)/$(params.PATH_CONTEXT)
+    script: |
+      #!/usr/-bin/env bash
+      set -euxo pipefail
+      
+      # This runs the script from your repository to generate the .spec file
+      /workspace/pre-build-script.sh
+      
+      echo "SUCCESS: microshift-gitops.spec file generated."
