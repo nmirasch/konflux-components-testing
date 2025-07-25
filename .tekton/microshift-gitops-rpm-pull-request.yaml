@@ -32,17 +32,19 @@ spec:
     value: "{{ target_branch }}"
   - name: hermetic
     value: "true"
+  - name: tool-image-url
+    value: quay.io/redhat-user-workloads/nmirasch-tenant/microshift-gitops-builder:{{revision}}
   - name: path-context
-    value: rpms/microshift-gitops
+    value: "."
   pipelineRef:
     resolver: git
     params:
     - name: url
-      value: "https://github.com/konflux-ci/rpmbuild-pipeline.git"
+      value: "{{ source_url }}"
     - name: revision
-      value: main
+      value: "{{ revision }}"
     - name: pathInRepo
-      value: pipeline/build-rpm-package.yaml
+      value: .tekton/pipeline.yaml
   workspaces:
   - name: source
     persistentVolumeClaim:

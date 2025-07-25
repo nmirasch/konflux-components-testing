@@ -1,0 +1,74 @@
+apiVersion: tekton.dev/v1
+kind: Pipeline
+metadata:
+  name: custom-rpm-build-pipeline
+spec:
+  params:
+  - name: git-url
+  - name: revision
+  - name: tool-image-url
+  - name: path-context
+    default: "."
+  workspaces:
+  - name: source
+  - name: git-auth
+  tasks:
+  # Task 1: Clone the repository
+  - name: fetch-repository
+    taskRef:
+      name: git-clone
+      kind: ClusterTask
+    workspaces:
+    - name: output
+      workspace: source
+    - name: basic-auth
+      workspace: git-auth
+    params:
+    - name: url
+      value: $(params.git-url)
+    - name: revision
+      value: $(params.revision)
+  
+  # Task 2: Build your tool image with skopeo and other tools
+  - name: build-tool-image
+    runAfter: [fetch-repository]
+    taskRef:
+      name: buildah-from-containerfile
+    workspaces:
+    - name: source
+      workspace: source
+    params:
+    - name: image
+      value: $(params.tool-image-url)
+    - name: context
+      value: $(params.path-context)
+  
+  # Task 3: Generate the .spec file using the tool image
+  - name: generate-spec
+    runAfter: [build-tool-image]
+    taskRef:
+      name: generate-spec-file # The new task you just created
+    workspaces:
+    - name: source
+      workspace: source
+    params:
+    - name: TOOL_IMAGE
+      value: $(tasks.build-tool-image.results.IMAGE_URL)
+    - name: PATH_CONTEXT
+      value: $(params.path-context)
+  
+  # Task 4: Build the RPM using the official Konflux CI task
+  - name: build-rpm-package
+    runAfter: [generate-spec]
+    workspaces:
+    - name: source
+      workspace: source
+    taskRef:
+      resolver: git
+      params:
+      - name: url
+        value: "https://github.com/konflux-ci/rpmbuild-pipeline.git"
+      - name: revision
+        value: main
+      - name: pathInRepo
+        value: pipeline/build-rpm-package.yaml

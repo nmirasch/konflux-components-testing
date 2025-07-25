@@ -24,7 +24,8 @@ RUN dnf install -y \
     jq \
     sed \
     gawk \
-    tar && \
+    tar \
+    skopeo && \
     dnf clean all
 
 WORKDIR /workspace
