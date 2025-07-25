@@ -134,4 +134,4 @@ spec:
       - name: revision
         value: "main"
       - name: pathInRepo
-        value: "pipelines/build-rpm-package.yaml"
+        value: "task/rpmbuild.yaml"
