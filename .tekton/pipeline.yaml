@@ -3,7 +3,6 @@ kind: Pipeline
 metadata:
   name: custom-rpm-build-pipeline
 spec:
-  # Parameters for the entire workflow
   params:
   - name: git-url
   - name: revision
@@ -16,14 +15,13 @@ spec:
   - name: hermetic
     default: "false"
   
-  # Workspaces shared across tasks
   workspaces:
   - name: source
   - name: git-auth
   
   tasks:
   # Task 1: Clone the repository
-  - name: git-clone
+  - name: fetch-repository
     taskRef:
       resolver: hub
       params:
@@ -46,7 +44,7 @@ spec:
   
   # Task 2: Build your tools image from the Dockerfile
   - name: build-tools-image
-    runAfter: [git-clone]
+    runAfter: [fetch-repository]
     workspaces:
     - name: source
       workspace: source
@@ -63,13 +61,21 @@ spec:
       - name: source
       results:
       - name: IMAGE_URL
+      - name: IMAGE_DIGEST
       steps:
       - name: build-and-push
         image: quay.io/buildah/stable:v1.33
         workingDir: $(workspaces.source.path)
         script: |
-          buildah bud -t "$(params.image)" -f "$(params.context)/Dockerfile" "$(params.context)"
-          buildah push "$(params.image)" "docker://$(params.image)"
+          buildah bud \
+            -t "$(params.image)" \
+            -f "$(params.context)/Dockerfile" "$(params.context)"
+          
+          buildah push \
+            --digestfile "$(results.IMAGE_DIGEST.path)" \
+            "$(params.image)" \
+            "docker://$(params.image)"
+          
           echo -n "$(params.image)" | tee "$(results.IMAGE_URL.path)"
   
   # Task 3: Generate the .spec file using the tools image
@@ -99,10 +105,13 @@ spec:
           /workspace/pre-build-script.sh
           echo "SUCCESS: microshift-gitops.spec file generated."
   
-  # Task 4: Call the remote Konflux pipeline to build the RPM
-  - name: run-konflux-rpm-build
+  # Task 4: Build the RPM using the official Konflux CI task
+  - name: build-rpm-package
     runAfter: [generate-spec-file]
-    pipelineRef:
+    workspaces:
+    - name: source
+      workspace: source
+    taskRef:
       resolver: git
       params:
       - name: url
@@ -110,15 +119,8 @@ spec:
       - name: revision
         value: "main"
       - name: pathInRepo
-        value: "pipeline/build-rpm-package.yaml"
-    workspaces:
-    - name: source
-      workspace: source
+        value: "task/rpmbuild.yaml"
     params:
-    - name: git-url
-      value: $(params.git-url)
-    - name: revision
-      value: $(params.revision)
     - name: package-name
       value: $(params.package-name)
     - name: ociStorage
