@@ -37,12 +37,11 @@ kind: Task
 metadata:
   name: generate-spec-file
 spec:
-  description: >-
-    This task runs a preparation script inside a custom tool image
+  description: This task runs a preparation script inside a custom tool image
     to generate a final .spec file.
   params:
   - name: TOOL_IMAGE
-    description: The URL of the tool image to use (e.g., the one with skopeo).
+    description: The URL of the tool image to use for generating the .spec file.
   - name: PATH_CONTEXT
     description: The path to the working directory.
     default: "."
@@ -54,7 +53,7 @@ spec:
     image: $(params.TOOL_IMAGE)
     workingDir: $(workspaces.source.path)/$(params.PATH_CONTEXT)
     script: |
-      #!/usr/bin/env bash
+      #!/usr/-bin/env bash
       set -euxo pipefail
       
       # This runs the script from your repository to generate the .spec file
@@ -133,6 +132,6 @@ spec:
       - name: url
         value: "https://github.com/konflux-ci/rpmbuild-pipeline.git"
       - name: revision
-        value: main
+        value: "main"
       - name: pathInRepo
-        value: pipeline/build-rpm-package.yaml
+        value: "pipelines/build-rpm-package.yaml"
