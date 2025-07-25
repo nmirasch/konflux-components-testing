@@ -8,7 +8,7 @@ set -euxo pipefail
 # - sed
 # - skopeo
 # - yq
-
+echo "__________________________________________________ Building microshift-gitops.spec file"
 # --- ARGO-CD variables ---
 # Define the version and tag for the Argo CD image.
 GITOPS_VERSION="1.16.1-1"
@@ -55,3 +55,5 @@ sed -i "s/REPLACE_REDIS_CONTAINER_SHA_ARM/${REDIS_IMAGE_SHA_ARM}/g" microshift-g
 # Update the final spec file.
 sed -i "s/REPLACE_REDIS_CONTAINER_SHA_X86/${REDIS_IMAGE_SHA_X86}/g" microshift-gitops.spec
 sed -i "s/REPLACE_REDIS_CONTAINER_SHA_ARM/${REDIS_IMAGE_SHA_ARM}/g" microshift-gitops.spec
+
+echo "__________________________________________________Created microshift-gitops.spec file"
