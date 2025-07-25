@@ -25,7 +25,6 @@ RUN dnf install -y \
     sed \
     gawk \
     tar && \
-    # Limpiamos la caché de dnf para mantener la imagen final más ligera.
     dnf clean all
 
 WORKDIR /workspace
