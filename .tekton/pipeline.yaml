@@ -23,7 +23,7 @@ spec:
     script: |
       buildah bud \
         -t "$(params.image)" \
-        -f "$(params.context)/Containerfile" "$(params.context)"
+        -f "$(params.context)/Dockerfile" "$(params.context)"
       
       buildah push \
         --digestfile "$(results.IMAGE_DIGEST.path)" \
