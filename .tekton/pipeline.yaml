@@ -121,3 +121,18 @@ spec:
     - name: PATH_CONTEXT
       value: $(params.path-context)
   
+  # Task 4: Build the RPM using the official Konflux CI task
+  - name: build-rpm-package
+    runAfter: [generate-spec]
+    workspaces:
+    - name: source
+      workspace: source
+    taskRef:
+      resolver: git
+      params:
+      - name: url
+        value: "https://github.com/konflux-ci/rpmbuild-pipeline.git"
+      - name: revision
+        value: main
+      - name: pathInRepo
+        value: pipeline/build-rpm-package.yaml
