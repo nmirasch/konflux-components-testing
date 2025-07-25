@@ -24,22 +24,11 @@ spec:
   - name: git-auth
   
   tasks:
-  # Task 1: Clone the repository (no changes here)
   - name: fetch-repository
-    taskRef:
-      resolver: hub
-      params:
-      - name: name
-        value: git-clone
-      - name: kind
-        value: task
-      - name: version
-        value: "0.9"
+    taskRef: { name: git-clone, kind: ClusterTask }
     workspaces:
     - name: output
       workspace: source
-    - name: basic-auth
-      workspace: git-auth
     params:
     - name: url
       value: $(params.git-url)
