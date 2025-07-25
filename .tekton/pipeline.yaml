@@ -42,7 +42,7 @@ spec:
     - name: revision
       value: $(params.revision)
   
-  # Task 2: Build your tools image from the Dockerfile
+  # Task 2: Build tools image from the Dockerfile
   - name: build-tools-image
     runAfter: [fetch-repository]
     workspaces:
@@ -129,3 +129,13 @@ spec:
       value: $(params.target-branch)
     - name: hermetic
       value: $(params.hermetic)
+    - name: PLATFORM
+      value: "linux/amd64"
+    - name: script-environment-image
+      value: ""
+    - name: dependencies-artifact
+      value: ""
+    - name: calculation-artifact
+      value: ""
+    - name: ociArtifactExpiresAfter
+      value: ""
