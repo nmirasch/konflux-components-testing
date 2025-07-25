@@ -3,6 +3,7 @@ kind: Pipeline
 metadata:
   name: custom-rpm-build-pipeline
 spec:
+  # Parameters for the entire workflow
   params:
   - name: git-url
   - name: revision
@@ -10,34 +11,42 @@ spec:
   - name: path-context
     default: "."
   - name: package-name
-    description: The name of the package to build.
   - name: ociStorage
-    description: The container registry where the final RPM artifact will be stored.
   - name: target-branch
-    description: The target branch of the pull request.
   - name: hermetic
-    description: Specifies whether the build should be hermetic.
     default: "false"
   
+  # Workspaces shared across tasks
   workspaces:
   - name: source
   - name: git-auth
   
   tasks:
-  - name: fetch-repository
-    taskRef: { name: git-clone, kind: ClusterTask }
+  # Task 1: Clone the repository
+  - name: git-clone
+    taskRef:
+      resolver: hub
+      params:
+      - name: name
+        value: git-clone
+      - name: kind
+        value: task
+      - name: version
+        value: "0.9"
     workspaces:
     - name: output
       workspace: source
+    - name: basic-auth
+      workspace: git-auth
     params:
     - name: url
       value: $(params.git-url)
     - name: revision
       value: $(params.revision)
   
-  # Task 2: Build your tools image (no changes here)
+  # Task 2: Build your tools image from the Dockerfile
   - name: build-tools-image
-    runAfter: [fetch-repository]
+    runAfter: [git-clone]
     workspaces:
     - name: source
       workspace: source
@@ -54,24 +63,16 @@ spec:
       - name: source
       results:
       - name: IMAGE_URL
-      - name: IMAGE_DIGEST
       steps:
       - name: build-and-push
         image: quay.io/buildah/stable:v1.33
         workingDir: $(workspaces.source.path)
         script: |
-          buildah bud \
-            -t "$(params.image)" \
-            -f "$(params.context)/Dockerfile" "$(params.context)"
-          
-          buildah push \
-            --digestfile "$(results.IMAGE_DIGEST.path)" \
-            "$(params.image)" \
-            "docker://$(params.image)"
-          
+          buildah bud -t "$(params.image)" -f "$(params.context)/Dockerfile" "$(params.context)"
+          buildah push "$(params.image)" "docker://$(params.image)"
           echo -n "$(params.image)" | tee "$(results.IMAGE_URL.path)"
   
-  # Task 3: Generate the .spec file
+  # Task 3: Generate the .spec file using the tools image
   - name: generate-spec-file
     runAfter: [build-tools-image]
     workspaces:
@@ -98,13 +99,10 @@ spec:
           /workspace/pre-build-script.sh
           echo "SUCCESS: microshift-gitops.spec file generated."
   
-  # Task 4: Build the RPM using the official Konflux CI task
-  - name: build-rpm-package
+  # Task 4: Call the remote Konflux pipeline to build the RPM
+  - name: run-konflux-rpm-build
     runAfter: [generate-spec-file]
-    workspaces:
-    - name: source
-      workspace: source
-    taskRef:
+    pipelineRef:
       resolver: git
       params:
       - name: url
@@ -112,8 +110,15 @@ spec:
       - name: revision
         value: "main"
       - name: pathInRepo
-        value: "task/rpmbuild.yaml"
+        value: "pipeline/build-rpm-package.yaml"
+    workspaces:
+    - name: source
+      workspace: source
     params:
+    - name: git-url
+      value: $(params.git-url)
+    - name: revision
+      value: $(params.revision)
     - name: package-name
       value: $(params.package-name)
     - name: ociStorage
@@ -122,13 +127,3 @@ spec:
       value: $(params.target-branch)
     - name: hermetic
       value: $(params.hermetic)
-    - name: PLATFORM
-      value: "linux/amd64"
-    - name: script-environment-image
-      value: ""
-    - name: dependencies-artifact
-      value: ""
-    - name: calculation-artifact
-      value: ""
-    - name: ociArtifactExpiresAfter
-      value: ""
