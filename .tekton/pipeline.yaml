@@ -64,7 +64,7 @@ spec:
       - name: IMAGE_DIGEST
       steps:
       - name: build-and-push
-        image: quay.io/buildah/stable:v1.33
+        image: quay.io/buildah/stable:v1.40
         workingDir: $(workspaces.source.path)
         script: |
           buildah bud \
