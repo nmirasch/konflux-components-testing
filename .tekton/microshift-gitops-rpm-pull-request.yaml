@@ -32,8 +32,6 @@ spec:
     value: "{{ target_branch }}"
   - name: hermetic
     value: "true"
-  - name: path-context
-    value: rpms/microshift-gitops
   pipelineRef:
     resolver: git
     params:
