@@ -19,43 +19,26 @@ metadata:
   namespace: nmirasch-tenant
 spec:
   params:
-  # Parameters for the final RPM artifact
-  - name: ociStorage
-    value: quay.io/redhat-user-workloads/nmirasch-tenant/microshift-gitops-rpm:{{revision}}
-  - name: package-name
-    value: microshift-gitops
-  
-  # Git parameters
   - name: git-url
-    value: "{{ source_url }}"
+    value: '{{source_url}}'
   - name: revision
-    value: "{{ revision }}"
-  - name: target-branch
-    value: "{{ target_branch }}"
-  
-  # New parameter for the temporary tools image
-  - name: tool-image-url
+    value: '{{revision}}'
+  - name: output-image
     value: quay.io/redhat-user-workloads/nmirasch-tenant/microshift-gitops-builder:{{revision}}
-  
-  # General parameters
-  - name: path-context
-    value: "."
-  - name: hermetic
-    value: "true"
-  
+  - name: additional-tags
+    value:
+    - '{{target_branch}}'
+  - name: dockerfile
+    value: Containerfile
+  - name: prefetch-input
+    value: '[{"type": "gomod", "path": "./sources/tools"}]'
+  - name: git-metadata-directories
+    value:
+    - sources/tools
   pipelineRef:
-    resolver: git
-    params:
-    - name: url
-      value: "{{ source_url }}"
-    - name: revision
-      value: "{{ revision }}"
-    - name: pathInRepo
-      value: .tekton/pipeline.yaml # This points to your new all-in-one pipeline
+    name: build-multi-platform-image
   workspaces:
-  - name: source
-    persistentVolumeClaim:
-      claimName: "{{pvc_name}}"
   - name: git-auth
     secret:
       secretName: '{{ git_auth_secret }}'
+status: {}
