@@ -162,17 +162,6 @@ spec:
     workspaces:
     - name: basic-auth
       workspace: git-auth
-  - name: generate-metadata
-    runAfter:
-    - clone-repository
-    taskRef:
-      name: generate-metadata
-    params:
-    - name: SOURCE_ARTIFACT
-      value: $(tasks.clone-repository.results.SOURCE_ARTIFACT)
-    - name: GIT_METADATA_DIRECTORIES
-      value:
-      - $(params.git-metadata-directories[*])
   - name: prefetch-dependencies
     params:
     - name: input
