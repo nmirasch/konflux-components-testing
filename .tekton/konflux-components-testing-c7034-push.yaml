@@ -22,7 +22,6 @@ spec:
     - name: git-url
     - name: revision
     - name: output-image
-    # Add params needed for spec-generator script
     - name: argo-cd-url
     - name: redis-url
     - name: source-commit
@@ -46,16 +45,16 @@ spec:
       - name: image-url
         value: $(params.output-image)
       - name: rebuild
-        value: "true" # Forcing a rebuild for now
-
+        value: "true"
+    
     # TASK 1: Clone Repository
     - name: clone-repository
-      runAfter: [init] # Runs after init
-      when: # But only IF init says to proceed
-        - input: $(tasks.init.results.build)
-          operator: in
-          values:
-            - 'true'
+      runAfter: [init]
+      when:
+      - input: $(tasks.init.results.build)
+        operator: in
+        values:
+        - 'true'
       taskRef:
         resolver: bundles
         params:
@@ -70,6 +69,8 @@ spec:
         value: $(params.git-url)
       - name: revision
         value: $(params.revision)
+      - name: ociStorage
+        value: "$(params.output-image).source"
       workspaces:
       - name: output
         workspace: source
@@ -90,7 +91,6 @@ spec:
           value: task
       params:
       - name: IMAGE
-        # We'll tag the utility image with a unique name
         value: "$(params.output-image)-spec-generator"
       - name: DOCKERFILE
         value: "./Containerfile"
@@ -101,7 +101,6 @@ spec:
         workspace: source
     
     # TASK 3: Run the script to generate the .spec file
-    # This is our custom logic, defined as an embedded task.
     - name: generate-spec-file
       runAfter: [build-spec-generator-image]
       taskSpec:
@@ -115,19 +114,15 @@ spec:
         - name: source
         steps:
         - name: run-generator
-          # This is the key: it uses the image we just built in the previous step
           image: $(params.generator-image-url)
           workingDir: $(workspaces.source.path)
           script: |
             #!/bin/bash
             set -euxo pipefail
-            # Pass pipeline params to the script as environment variables
             export ARGO_CD_IMAGE_URL_WITH_TAG="$(params.argo-cd-url)"
             export REDIS_IMAGE_URL_WITH_TAG="$(params.redis-url)"
             export CI_ARGO_CD_UPSTREAM_COMMIT="$(params.source-commit)"
             export CI_ARGO_CD_UPSTREAM_URL="$(params.source-url)"
-            
-            # Execute your script
             ./scripts/generate-spec.sh
       params:
       - name: generator-image-url
@@ -143,27 +138,6 @@ spec:
       workspaces:
       - name: source
         workspace: source
-    
-    # TASK 4: (Placeholder) Build the final RPM
-    # This is where you would add the standard Konflux task for building RPMs.
-    # It would run after 'generate-spec-file' and use the same 'source' workspace,
-    # where it would find both your source code and the newly created .spec file.
-    # - name: build-rpm
-    #   runAfter: [generate-spec-file]
-    #   taskRef:
-    #     resolver: bundles
-    #     params:
-    #       - name: bundle
-    #         value: <URL to the Konflux RPM build task bundle>
-    #       - name: name
-    #         value: <Name of the RPM build task>
-    #       - name: kind
-    #         value: task
-    #   params:
-    #     - name: ...
-    #   workspaces:
-    #     - name: source
-    #       workspace: source
   
   # These are the parameters for the entire PipelineRun
   params:
@@ -172,13 +146,13 @@ spec:
   - name: revision
     value: "{{ revision }}"
   - name: output-image
-    value: "quay.io/your-quay-user/your-repo" # CHANGE THIS
+    value: "quay.io/repository/redhat-user-workloads/nmirasch-tenant/spec-file-generator" # CHANGE THIS to your actual Quay.io username and repository
   - name: argo-cd-url
     value: "registry.redhat.io/openshift-gitops-1/argocd-rhel9:v1.16"
   - name: redis-url
     value: "registry.redhat.io/rhel9/redis-6:9.6"
   - name: source-commit
-    value: "a1b2c3d4"
+    value: "bfa7247"
   - name: source-url
     value: "https://github.com/argoproj/argo-cd"
   
