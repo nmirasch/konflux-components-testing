@@ -96,6 +96,10 @@ spec:
         value: "./Containerfile"
       - name: CONTEXT
         value: "."
+      - name: SOURCE_ARTIFACT
+        value: $(tasks.clone-repository.results.SOURCE_ARTIFACT)
+      - name: PLATFORM
+        value: "linux/amd64"
       workspaces:
       - name: source
         workspace: source
