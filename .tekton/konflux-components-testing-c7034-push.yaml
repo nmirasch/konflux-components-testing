@@ -29,28 +29,31 @@ spec:
     workspaces:
     - name: source
     - name: git-auth
-    
     tasks:
-    # TASK 1: Clones git repository into the shared workspace.
+    # TASK 1: Repository Clone
     - name: fetch-repository
-      taskRef: { name: git-clone, kind: ClusterTask }
+      taskRef:
+        name: git-clone
+        kind: ClusterTask
+        apiVersion: tekton.dev/v1
+      workspaces:
+      - name: output
+        workspace: source
       params:
       - name: url
         value: $(params.git-url)
       - name: revision
         value: $(params.revision)
-      workspaces:
-      - name: output
-        workspace: source
     
-    # TASK 2: Builds the 'spec-generator' image using the 'buildah' ClusterTask.
-    # It reads the Containerfile from the cloned source code.
+    # TASK 2: build spec-generator image
     - name: build-spec-generator-image
-      runAfter: [ fetch-repository ]
-      taskRef: { name: buildah, kind: ClusterTask }
+      runAfter: [fetch-repository]
+      taskRef:
+        name: buildah
+        kind: ClusterTask
+        apiVersion: tekton.dev/v1
       params:
       - name: IMAGE
-        # The output image is tagged with the git commit SHA to be unique.
         value: "$(params.ociStorage)-spec-generator:{{revision}}"
       - name: DOCKERFILE
         value: "./Containerfile"
@@ -58,10 +61,10 @@ spec:
       - name: source
         workspace: source
     
-    # TASK 3: Runs your script using the image that was just built in Task 2.
+    # TASK 3: generate spec file
     - name: generate-spec-file
-      runAfter: [ build-spec-generator-image ]
-      taskSpec: # The task is embedded here
+      runAfter: [build-spec-generator-image]
+      taskSpec:
         params:
         - name: argo-cd-url
         - name: redis-url
@@ -72,11 +75,8 @@ spec:
         - name: source
         steps:
         - name: generate
-          # This is the key: it uses the output URL from the previous task.
           image: $(params.generator-image-url)
           workingDir: $(workspaces.source.path)
-          # The script inside passes pipeline params as environment variables
-          # to your shell script.
           script: |
             #!/bin/bash
             set -euxo pipefail
@@ -100,6 +100,7 @@ spec:
       - name: generator-image-url
         value: $(tasks.build-spec-generator-image.results.IMAGE_URL)
   
+  # PipelineRun-level parameters
   params:
   - name: git-url
     value: "{{ source_url }}"
@@ -120,7 +121,7 @@ spec:
   - name: source
     volumeClaimTemplate:
       spec:
-        accessModes: [ ReadWriteOnce ]
+        accessModes: [ReadWriteOnce]
         resources: { requests: { storage: 1Gi } }
   - name: git-auth
     secret:
