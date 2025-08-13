@@ -143,7 +143,7 @@ spec:
   - name: revision
     value: "{{ revision }}"
   - name: output-image
-    value: "quay.io/redhat-user-workloads/nmirasch-tenant/spec-file-generator:{{revision}}"
+    value: "https://quay.io/repository/nmirasch/spec-file-generator:{{revision}}"
   - name: argo-cd-url
     value: "registry.redhat.io/openshift-gitops-1/argocd-rhel9:v1.16"
   - name: redis-url
