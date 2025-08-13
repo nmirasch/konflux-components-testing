@@ -21,7 +21,8 @@ spec:
     params:
     - name: git-url
     - name: revision
-    - name: ociStorage
+    - name: output-image
+    # Add params needed for spec-generator script
     - name: argo-cd-url
     - name: redis-url
     - name: source-commit
@@ -29,66 +30,108 @@ spec:
     workspaces:
     - name: source
     - name: git-auth
+    
     tasks:
-    # TASK 1: Repository Clone
-    - name: fetch-repository
+    - name: init
       taskRef:
-        name: git-clone
-        kind: ClusterTask
-        apiVersion: tekton.dev/v1
-      workspaces:
-      - name: output
-        workspace: source
+        resolver: bundles
+        params:
+        - name: bundle
+          value: quay.io/konflux-ci/tekton-catalog/task-init:0.2@sha256:66e90d31e1386bf516fb548cd3e3f0082b5d0234b8b90dbf9e0d4684b70dbe1a
+        - name: name
+          value: init
+        - name: kind
+          value: task
+      params:
+      - name: image-url
+        value: $(params.output-image)
+      - name: rebuild
+        value: "true" # Forcing a rebuild for now
+
+    # TASK 1: Clone Repository
+    - name: clone-repository
+      runAfter: [init] # Runs after init
+      when: # But only IF init says to proceed
+        - input: $(tasks.init.results.build)
+          operator: in
+          values:
+            - 'true'
+      taskRef:
+        resolver: bundles
+        params:
+        - name: bundle
+          value: quay.io/konflux-ci/tekton-catalog/task-git-clone-oci-ta:0.1@sha256:d35e5d501cb5f5f88369511f76249857cb5ac30250e1dcf086939321964ff6b9
+        - name: name
+          value: git-clone-oci-ta
+        - name: kind
+          value: task
       params:
       - name: url
         value: $(params.git-url)
       - name: revision
         value: $(params.revision)
+      workspaces:
+      - name: output
+        workspace: source
+      - name: basic-auth
+        workspace: git-auth
     
-    # TASK 2: build spec-generator image
+    # TASK 2: Build the 'spec-generator' utility image
     - name: build-spec-generator-image
-      runAfter: [fetch-repository]
+      runAfter: [clone-repository]
       taskRef:
-        name: buildah
-        kind: ClusterTask
-        apiVersion: tekton.dev/v1
+        resolver: bundles
+        params:
+        - name: bundle
+          value: quay.io/konflux-ci/tekton-catalog/task-buildah-remote-oci-ta:0.4@sha256:5b8d51fa889cdac873750904c3fccc0cca1c4f65af16902ebb2b573151f80657
+        - name: name
+          value: buildah-remote-oci-ta
+        - name: kind
+          value: task
       params:
       - name: IMAGE
-        value: "$(params.ociStorage)-spec-generator:{{revision}}"
+        # We'll tag the utility image with a unique name
+        value: "$(params.output-image)-spec-generator"
       - name: DOCKERFILE
         value: "./Containerfile"
+      - name: CONTEXT
+        value: "."
       workspaces:
       - name: source
         workspace: source
     
-    # TASK 3: generate spec file
+    # TASK 3: Run the script to generate the .spec file
+    # This is our custom logic, defined as an embedded task.
     - name: generate-spec-file
       runAfter: [build-spec-generator-image]
       taskSpec:
         params:
+        - name: generator-image-url
         - name: argo-cd-url
         - name: redis-url
         - name: source-commit
         - name: source-url
-        - name: generator-image-url
         workspaces:
         - name: source
         steps:
-        - name: generate
+        - name: run-generator
+          # This is the key: it uses the image we just built in the previous step
           image: $(params.generator-image-url)
           workingDir: $(workspaces.source.path)
           script: |
             #!/bin/bash
             set -euxo pipefail
+            # Pass pipeline params to the script as environment variables
             export ARGO_CD_IMAGE_URL_WITH_TAG="$(params.argo-cd-url)"
             export REDIS_IMAGE_URL_WITH_TAG="$(params.redis-url)"
             export CI_ARGO_CD_UPSTREAM_COMMIT="$(params.source-commit)"
             export CI_ARGO_CD_UPSTREAM_URL="$(params.source-url)"
-            ./scripts/generate-spec-only.sh
-      workspaces:
-      - name: source
-        workspace: source
+            
+            # Execute your script
+            ./scripts/generate-spec.sh
       params:
+      - name: generator-image-url
+        value: $(tasks.build-spec-generator-image.results.IMAGE_URL)
       - name: argo-cd-url
         value: $(params.argo-cd-url)
       - name: redis-url
@@ -97,21 +140,43 @@ spec:
         value: $(params.source-commit)
       - name: source-url
         value: $(params.source-url)
-      - name: generator-image-url
-        value: $(tasks.build-spec-generator-image.results.IMAGE_URL)
+      workspaces:
+      - name: source
+        workspace: source
+    
+    # TASK 4: (Placeholder) Build the final RPM
+    # This is where you would add the standard Konflux task for building RPMs.
+    # It would run after 'generate-spec-file' and use the same 'source' workspace,
+    # where it would find both your source code and the newly created .spec file.
+    # - name: build-rpm
+    #   runAfter: [generate-spec-file]
+    #   taskRef:
+    #     resolver: bundles
+    #     params:
+    #       - name: bundle
+    #         value: <URL to the Konflux RPM build task bundle>
+    #       - name: name
+    #         value: <Name of the RPM build task>
+    #       - name: kind
+    #         value: task
+    #   params:
+    #     - name: ...
+    #   workspaces:
+    #     - name: source
+    #       workspace: source
   
-  # PipelineRun-level parameters
+  # These are the parameters for the entire PipelineRun
   params:
   - name: git-url
     value: "{{ source_url }}"
   - name: revision
     value: "{{ revision }}"
-  - name: ociStorage
-    value: "quay.io/redhat-user-workloads/nmirasch-tenant/konflux-components-testing-c7034"
+  - name: output-image
+    value: "quay.io/your-quay-user/your-repo" # CHANGE THIS
   - name: argo-cd-url
-    value: "registry.redhat.io/openshift-gitops-1/argocd-rhel9:gitops-1.17-rhel-9-candidate"
+    value: "registry.redhat.io/openshift-gitops-1/argocd-rhel9:v1.16"
   - name: redis-url
-    value: "registry.redhat.io/rhel9/redis-6:rhel-9.3.0-container-released"
+    value: "registry.redhat.io/rhel9/redis-6:9.6"
   - name: source-commit
     value: "a1b2c3d4"
   - name: source-url
