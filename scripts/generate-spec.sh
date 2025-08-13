@@ -2,7 +2,6 @@
 
 set -euxo pipefail
 
-# --- Step 1: Define Repositories and Search Patterns ---
 ARGO_CD_REPO="docker://registry.redhat.io/openshift-gitops-1/argocd-rhel9"
 ARGO_CD_TAG_PATTERN="v1.16"
 
