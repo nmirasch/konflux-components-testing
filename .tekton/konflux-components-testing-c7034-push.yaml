@@ -47,7 +47,6 @@ spec:
       - name: rebuild
         value: "true"
     
-    # TASK 1: Clone Repository
     - name: clone-repository
       runAfter: [init]
       when:
@@ -72,12 +71,9 @@ spec:
       - name: ociStorage
         value: "$(params.output-image).source"
       workspaces:
-      - name: output
-        workspace: source
       - name: basic-auth
         workspace: git-auth
     
-    # TASK 2: Build the 'spec-generator' utility image
     - name: build-spec-generator-image
       runAfter: [clone-repository]
       taskRef:
@@ -100,11 +96,7 @@ spec:
         value: $(tasks.clone-repository.results.SOURCE_ARTIFACT)
       - name: PLATFORM
         value: "linux/amd64"
-      workspaces:
-      - name: source
-        workspace: source
-    
-    # TASK 3: Run the script to generate the .spec file
+      
     - name: generate-spec-file
       runAfter: [build-spec-generator-image]
       taskSpec:
@@ -123,6 +115,7 @@ spec:
           script: |
             #!/bin/bash
             set -euxo pipefail
+            echo "Running spec generator..."
             export ARGO_CD_IMAGE_URL_WITH_TAG="$(params.argo-cd-url)"
             export REDIS_IMAGE_URL_WITH_TAG="$(params.redis-url)"
             export CI_ARGO_CD_UPSTREAM_COMMIT="$(params.source-commit)"
@@ -143,7 +136,6 @@ spec:
       - name: source
         workspace: source
   
-  # These are the parameters for the entire PipelineRun
   params:
   - name: git-url
     value: "{{ source_url }}"
