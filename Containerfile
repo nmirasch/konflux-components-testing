@@ -23,14 +23,19 @@ RUN dnf install -y \
     jq \
     sed \
     gawk \
-    tar && \
+    tar \
+    skopeo && \
+    # Since yq is not in the default repos, download the binary directly
+    curl -L https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64 -o /usr/bin/yq && \
+    # Make the downloaded binary executable
+    chmod +x /usr/bin/yq && \
     dnf clean all
 
 WORKDIR /workspace
 
 COPY . .
 
-CMD ["/workspace/pre-build-script.sh"]
+CMD ["/workspace/scripts/generate-spec.sh"]
 
 LABEL \
     name="openshift-gitops-1/microshift-gitops-rpm-rhel8" \

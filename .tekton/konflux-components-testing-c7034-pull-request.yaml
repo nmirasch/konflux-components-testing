@@ -32,47 +32,52 @@ spec:
     - name: git-auth
     
     tasks:
-    # TASK 1: Repository Clone
+    # TASK 1: Clones git repository into the shared workspace.
     - name: fetch-repository
       taskRef: { name: git-clone, kind: ClusterTask }
-      workspaces:
-      - name: output
-        workspace: source
       params:
       - name: url
         value: $(params.git-url)
       - name: revision
         value: $(params.revision)
+      workspaces:
+      - name: output
+        workspace: source
     
-    # TASK 2: build spec-generator image
+    # TASK 2: Builds the 'spec-generator' image using the 'buildah' ClusterTask.
+    # It reads the Containerfile from the cloned source code.
     - name: build-spec-generator-image
-      runAfter: [fetch-repository]
+      runAfter: [ fetch-repository ]
       taskRef: { name: buildah, kind: ClusterTask }
       params:
       - name: IMAGE
-        value: "$(params.ociStorage)-spec-generator:{{revision}}" # Etiqueta única por commit
+        # The output image is tagged with the git commit SHA to be unique.
+        value: "$(params.ociStorage)-spec-generator:{{revision}}"
       - name: DOCKERFILE
         value: "./Containerfile"
       workspaces:
       - name: source
         workspace: source
     
-    # TASK 3: generate spec file
+    # TASK 3: Runs your script using the image that was just built in Task 2.
     - name: generate-spec-file
-      runAfter: [build-spec-generator-image]
-      taskSpec: # Tarea embebida
+      runAfter: [ build-spec-generator-image ]
+      taskSpec: # The task is embedded here
         params:
         - name: argo-cd-url
         - name: redis-url
         - name: source-commit
         - name: source-url
-        - name: generator-image-url # Recibe la URL de la imagen de la tarea anterior
+        - name: generator-image-url
         workspaces:
         - name: source
         steps:
         - name: generate
-          image: $(params.generator-image-url) # Usa la imagen construida
+          # This is the key: it uses the output URL from the previous task.
+          image: $(params.generator-image-url)
           workingDir: $(workspaces.source.path)
+          # The script inside passes pipeline params as environment variables
+          # to your shell script.
           script: |
             #!/bin/bash
             set -euxo pipefail
@@ -93,11 +98,9 @@ spec:
         value: $(params.source-commit)
       - name: source-url
         value: $(params.source-url)
-      # Pasamos el resultado de la Tarea 2 a la Tarea 3
       - name: generator-image-url
         value: $(tasks.build-spec-generator-image.results.IMAGE_URL)
   
-  # Parámetros para este PipelineRun específico
   params:
   - name: git-url
     value: "{{ source_url }}"
@@ -118,7 +121,7 @@ spec:
   - name: source
     volumeClaimTemplate:
       spec:
-        accessModes: [ReadWriteOnce]
+        accessModes: [ ReadWriteOnce ]
         resources: { requests: { storage: 1Gi } }
   - name: git-auth
     secret:
