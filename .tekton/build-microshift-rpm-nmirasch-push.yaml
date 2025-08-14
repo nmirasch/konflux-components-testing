@@ -46,8 +46,6 @@ spec:
     tasks:
     - name: init
       taskRef:
-        apiVersion: tekton.dev/v1
-        kind: Task
         resolver: bundles
         params:
         - name: bundle
@@ -67,8 +65,6 @@ spec:
         operator: in
         values: ["true"]
       taskRef:
-        apiVersion: tekton.dev/v1
-        kind: Task
         resolver: bundles
         params:
         - name: bundle
@@ -93,8 +89,6 @@ spec:
         operator: in
         values: ["true"]
       taskRef:
-        apiVersion: tekton.dev/v1
-        kind: Task
         resolver: bundles
         params:
         - name: bundle
@@ -116,8 +110,6 @@ spec:
         operator: in
         values: ["true"]
       taskRef:
-        apiVersion: tekton.dev/v1
-        kind: Task
         resolver: bundles
         params:
         - name: bundle
@@ -159,7 +151,6 @@ spec:
             echo "Workspace contents:"
             ls -laR
             
-            # Now the script can be found and executed
             export ARGO_CD_IMAGE_URL_WITH_TAG="$(params.argo-cd-url)"
             export REDIS_IMAGE_URL_WITH_TAG="$(params.redis-url)"
             export CI_ARGO_CD_UPSTREAM_COMMIT="$(params.source-commit)"
