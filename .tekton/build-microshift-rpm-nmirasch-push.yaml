@@ -47,14 +47,13 @@ spec:
     - name: init
       taskRef:
         apiVersion: tekton.dev/v1
+        kind: Task
         resolver: bundles
         params:
         - name: bundle
           value: quay.io/konflux-ci/tekton-catalog/task-init:0.2@sha256:08e18a4dc5f947c1d20e8353a19d013144bea87b72f67236b165dd4778523951
         - name: name
           value: init
-        - name: kind
-          value: task
       params:
       - name: image-url
         value: $(params.output-image)
@@ -69,14 +68,13 @@ spec:
         values: ["true"]
       taskRef:
         apiVersion: tekton.dev/v1
+        kind: Task
         resolver: bundles
         params:
         - name: bundle
           value: quay.io/konflux-ci/tekton-catalog/task-git-clone-oci-ta:0.1@sha256:be82c55346e8810bd1edc5547f864064da6945979baccca7dfc99990b392a02b
         - name: name
           value: git-clone-oci-ta
-        - name: kind
-          value: task
       params:
       - name: url
         value: $(params.git-url)
@@ -96,14 +94,13 @@ spec:
         values: ["true"]
       taskRef:
         apiVersion: tekton.dev/v1
+        kind: Task
         resolver: bundles
         params:
         - name: bundle
           value: quay.io/konflux-ci/tekton-catalog/task-prefetch-dependencies-oci-ta:0.2@sha256:c5ebd3040df2511b8af762c8be946fd4ac9de60c16b81a9461534aea5979d86f
         - name: name
           value: prefetch-dependencies-oci-ta
-        - name: kind
-          value: task
       params:
       - name: SOURCE_ARTIFACT
         value: $(tasks.clone-repository.results.SOURCE_ARTIFACT)
@@ -120,14 +117,13 @@ spec:
         values: ["true"]
       taskRef:
         apiVersion: tekton.dev/v1
+        kind: Task
         resolver: bundles
         params:
         - name: bundle
           value: quay.io/konflux-ci/tekton-catalog/task-buildah-oci-ta:0.4@sha256:f91db5817f403628dbd268fea69503ba910443ef8d71c86f093776f45f57adb9
         - name: name
           value: buildah-oci-ta
-        - name: kind
-          value: task
       params:
       - name: IMAGE
         value: "$(params.output-image)-spec-generator"
