@@ -24,7 +24,8 @@ RUN dnf install -y \
     sed \
     gawk \
     tar \
-    skopeo && \
+    skopeo \
+    openshift-client && \
     # Since yq is not in the default repos, download the binary directly
     curl -L https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64 -o /usr/bin/yq && \
     # Make the downloaded binary executable
