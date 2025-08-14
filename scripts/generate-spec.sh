@@ -8,7 +8,7 @@ ARGO_CD_TAG_PATTERN="v1.16"
 REDIS_REPO="docker://registry.redhat.io/rhel9/redis-6"
 REDIS_TAG_PATTERN="9.6"
 
-echo "Searching for latest Argo CD tag..."
+echo "Searching for latest Argo CD tag...using skopeo"
 
 LATEST_ARGO_TAG=$(skopeo list-tags ${ARGO_CD_REPO} | jq -r '.Tags[]' | grep "^${ARGO_CD_TAG_PATTERN}" | grep -v -- "-source$" | sort -V | tail -n 1)
 echo "Found latest Argo CD tag: ${LATEST_ARGO_TAG}"
