@@ -18,22 +18,14 @@
 FROM registry.access.redhat.com/ubi8/ubi
 
 RUN dnf install -y \
-    rpm-build \
     curl \
     jq \
     sed \
     gawk \
     tar \
     skopeo && \
-    # Since yq is not in the default repos, download the binary
     curl -L https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64 -o /usr/bin/yq && \
     chmod +x /usr/bin/yq && \
-    # --- Install the oc client ---
-    echo "Downloading and installing OpenShift Client..." && \
-    curl -L https://mirror.openshift.com/pub/openshift-v4/clients/ocp/stable/openshift-client-linux.tar.gz -o openshift-client-linux.tar.gz && \
-    tar -xzf openshift-client-linux.tar.gz && \
-    mv oc kubectl /usr/local/bin/ && \
-    rm openshift-client-linux.tar.gz README.md && \
     dnf clean all
 
 WORKDIR /workspace

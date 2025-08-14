@@ -148,9 +148,8 @@ spec:
             set -euxo pipefail
             
             echo "Extracting source code from artifact..."
-            oc image extract $(tasks.prefetch-dependencies.results.SOURCE_ARTIFACT) --path /source:. -n $(context.pipelineRun.namespace)
-            
-            echo "Source extracted. Running spec generation script..."
+            echo "Workspace contents:"
+            ls -laR
             
             # Now the script can be found and executed
             export ARGO_CD_IMAGE_URL_WITH_TAG="$(params.argo-cd-url)"
