@@ -146,7 +146,14 @@ spec:
           script: |
             #!/bin/bash
             set -euxo pipefail
-            oc image extract $(tasks.prefetch-dependencies.results.SOURCE_ARTIFACT) --path /source:. -n $(context.pipelineRun.namespace)
+            
+            # The source code is already in the working directory from the
+            # clone-repository task. We can execute the script directly.
+            export ARGO_CD_IMAGE_URL_WITH_TAG="$(params.argo-cd-url)"
+            export REDIS_IMAGE_URL_WITH_TAG="$(params.redis-url)"
+            export CI_ARGO_CD_UPSTREAM_COMMIT="$(params.source-commit)"
+            export CI_ARGO_CD_UPSTREAM_URL="$(params.source-url)"
+            
             ./scripts/generate-spec.sh
       params:
       - name: generator-image-url
@@ -163,7 +170,6 @@ spec:
       - name: source
         workspace: source
     
-    # --- NEW FINAL TASK: Verify the .spec file ---
     - name: verify-spec-file
       runAfter: [generate-spec-file]
       when:
