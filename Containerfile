@@ -28,11 +28,11 @@ RUN dnf install -y \
     chmod +x /usr/bin/yq && \
     dnf clean all
 
-WORKDIR /workspace
+WORKDIR /src
 
 COPY . .
 
-CMD ["/workspace/scripts/generate-spec.sh"]
+CMD ["/src/scripts/generate-spec.sh"]
 
 LABEL \
     name="openshift-gitops-1/microshift-gitops-rpm-rhel8" \
