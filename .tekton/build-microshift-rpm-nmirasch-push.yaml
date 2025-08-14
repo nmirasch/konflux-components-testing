@@ -148,6 +148,7 @@ spec:
             set -euxo pipefail
             
             echo "Extracting source code from artifact..."
+            cp -R /workspace/. .
             echo "Workspace contents:"
             ls -laR
             
