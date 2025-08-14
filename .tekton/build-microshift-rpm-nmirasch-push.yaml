@@ -37,11 +37,13 @@ spec:
     - name: redis-url
     - name: source-commit
     - name: source-url
+    - name: prefetch-input
+      type: string
+      default: ""
     workspaces:
     - name: source
     - name: git-auth
     tasks:
-    # --- STANDARD KONFLUX TASKS ---
     - name: init
       taskRef:
         resolver: bundles
@@ -98,8 +100,9 @@ spec:
         value: $(tasks.clone-repository.results.SOURCE_ARTIFACT)
       - name: ociStorage
         value: $(params.output-image).prefetch
+      - name: input
+        value: $(params.prefetch-input)
     
-    # --- CUSTOM TASKS START HERE ---
     - name: build-spec-generator-image
       runAfter: [prefetch-dependencies]
       when:
