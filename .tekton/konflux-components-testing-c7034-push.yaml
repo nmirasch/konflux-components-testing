@@ -48,18 +48,13 @@ spec:
         value: "true"
     
     - name: clone-repository
-      retries: 3
       params:
       - name: url
         value: $(params.git-url)
       - name: revision
         value: $(params.revision)
-      - name: depth
-        value: 0
       - name: ociStorage
-        value: $(params.ociStorage).git
-      - name: ociArtifactExpiresAfter
-        value: 14d
+        value: $(params.output-image).git
       runAfter:
       - init
       taskRef:
@@ -67,10 +62,15 @@ spec:
         - name: name
           value: git-clone-oci-ta
         - name: bundle
-          value: quay.io/konflux-ci/tekton-catalog/task-git-clone-oci-ta:0.1@sha256:d35e5d501cb5f5f88369511f76249857cb5ac30250e1dcf086939321964ff6b9
+          value: quay.io/konflux-ci/tekton-catalog/task-git-clone-oci-ta:0.1@sha256:0761f97595d42c87c076797e0d0f66ff572146cad958106b7f5446b182d03394
         - name: kind
           value: task
         resolver: bundles
+      when:
+      - input: $(tasks.init.results.build)
+        operator: in
+        values:
+        - "true"
       workspaces:
       - name: basic-auth
         workspace: git-auth
@@ -160,4 +160,5 @@ spec:
         accessModes: [ReadWriteOnce]
         resources: { requests: { storage: 1Gi } }
   - name: git-auth
-    optional: true
+    secret:
+      secretName: '{{ git_auth_secret }}'
