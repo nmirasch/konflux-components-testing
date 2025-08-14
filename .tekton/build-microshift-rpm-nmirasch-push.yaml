@@ -202,38 +202,6 @@ spec:
       workspaces:
       - name: source
         workspace: source
-    
-    - name: build-rpm-package
-      runAfter: [verify-spec-file]
-      when:
-      - input: $(tasks.init.results.build)
-        operator: in
-        values: ["true"]
-      taskRef:
-        resolver: git
-        params:
-        - name: url
-          value: "https://github.com/konflux-ci/rpmbuild-pipeline.git"
-        - name: revision
-          value: main
-        - name: pathInRepo
-          value: "pipeline/build-rpm-package.yaml"
-      params:
-      - name: ociStorage
-        value: $(params.rpm-output-image)
-      - name: specfile
-        value: "microshift-gitops.spec"
-      - name: git-url
-        value: $(params.git-url)
-      - name: revision
-        value: $(params.revision)
-      - name: hermetic
-        value: "true"
-      workspaces:
-      - name: source
-        workspace: source
-      - name: git-auth
-        workspace: git-auth
   workspaces:
   - name: git-auth
     secret:
