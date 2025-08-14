@@ -40,8 +40,6 @@ spec:
       value: main
     - name: pathInRepo
       value: pipeline/build-rpm-package.yaml
-  taskRunTemplate:
-    serviceAccountName: build-pipeline-testing-build-rpm-nmirasch
   workspaces:
   - name: source
     persistentVolumeClaim:
@@ -49,4 +47,3 @@ spec:
   - name: git-auth
     secret:
       secretName: '{{ git_auth_secret }}'
-status: {}
