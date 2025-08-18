@@ -6,7 +6,7 @@ CI_X_VERSION=0
 CI_Y_VERSION=0
 CI_Z_VERSION=1
 CI_SPEC_RELEASE=1.0.0
-CI_ARGO_CD_UPSTREAM_URL=https://github.com/argoproj/argo-cd
+CI_ARGO_CD_UPSTREAM_URL=https://github.com/argoproj/argo-cd/archive/refs/tags/v3.1.0.tar.gz
 CI_ARGO_CD_UPSTREAM_COMMIT=f9bb3b608ee68c974ca748397598dcd6d113b121
 
 ARGO_CD_REPO="docker://registry.redhat.io/openshift-gitops-1/argocd-rhel9"
