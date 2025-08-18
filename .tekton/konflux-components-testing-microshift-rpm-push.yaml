@@ -18,202 +18,31 @@ metadata:
   namespace: rh-openshift-gitops-tenant
 spec:
   params:
+  - name: ociStorage
+    value: quay.io/redhat-user-workloads/rh-openshift-gitops-tenant/microshift-gitops-rpm:{{revision}}
+  - name: package-name
+    value: microshift-gitops
   - name: git-url
-    value: '{{source_url}}'
+    value: "{{ source_url }}"
   - name: revision
-    value: '{{revision}}'
-  - name: output-image
-    value: quay.io/redhat-user-workloads/rh-openshift-gitops-tenant/build-microshift-rpm-nmirasch:{{revision}}
-  - name: argo-cd-url
-    value: "registry.redhat.io/openshift-gitops-1/argocd-rhel9:v1.16"
-  - name: redis-url
-    value: "registry.redhat.io/rhel9/redis-6:6.2"
-  - name: source-commit
-    value: "a1b2c3d4"
-  - name: source-url
-    value: "https://github.com/argoproj/argo-cd"
-  pipelineSpec:
+    value: "{{ revision }}"
+  - name: target-branch
+    value: "{{ target_branch }}"
+  - name: hermetic
+    value: "true"
+  pipelineRef:
+    resolver: git
     params:
-    - name: git-url
+    - name: url
+      value: "https://github.com/konflux-ci/rpmbuild-pipeline.git"
     - name: revision
-    - name: output-image
-    - name: argo-cd-url
-    - name: redis-url
-    - name: source-commit
-    - name: source-url
-    - name: prefetch-input
-      type: string
-      default: ""
-    workspaces:
-    - name: source
-    - name: git-auth
-    tasks:
-    - name: init
-      taskRef:
-        resolver: bundles
-        params:
-        - name: bundle
-          value: quay.io/konflux-ci/tekton-catalog/task-init:0.2@sha256:08e18a4dc5f947c1d20e8353a19d013144bea87b72f67236b165dd4778523951
-        - name: name
-          value: init
-      params:
-      - name: image-url
-        value: $(params.output-image)
-      - name: rebuild
-        value: "true"
-    
-    - name: clone-repository
-      runAfter: [init]
-      when:
-      - input: $(tasks.init.results.build)
-        operator: in
-        values: ["true"]
-      taskRef:
-        resolver: bundles
-        params:
-        - name: bundle
-          value: quay.io/konflux-ci/tekton-catalog/task-git-clone-oci-ta:0.1@sha256:be82c55346e8810bd1edc5547f864064da6945979baccca7dfc99990b392a02b
-        - name: name
-          value: git-clone-oci-ta
-      params:
-      - name: url
-        value: $(params.git-url)
-      - name: revision
-        value: $(params.revision)
-      - name: ociStorage
-        value: $(params.output-image).git
-      workspaces:
-      - name: basic-auth
-        workspace: git-auth
-    
-    - name: prefetch-dependencies
-      runAfter: [clone-repository]
-      when:
-      - input: $(tasks.init.results.build)
-        operator: in
-        values: ["true"]
-      taskRef:
-        resolver: bundles
-        params:
-        - name: bundle
-          value: quay.io/konflux-ci/tekton-catalog/task-prefetch-dependencies-oci-ta:0.2@sha256:ca036c7232f63199824bc1a65126faad834bc3af030e5b8210cb057f4ae97d99
-        - name: name
-          value: prefetch-dependencies-oci-ta
-      params:
-      - name: SOURCE_ARTIFACT
-        value: $(tasks.clone-repository.results.SOURCE_ARTIFACT)
-      - name: ociStorage
-        value: $(params.output-image).prefetch
-      - name: input
-        value: $(params.prefetch-input)
-    
-    - name: build-spec-generator-image
-      runAfter: [prefetch-dependencies]
-      when:
-      - input: $(tasks.init.results.build)
-        operator: in
-        values: ["true"]
-      taskRef:
-        resolver: bundles
-        params:
-        - name: bundle
-          value: quay.io/konflux-ci/tekton-catalog/task-buildah-oci-ta:0.4@sha256:f91db5817f403628dbd268fea69503ba910443ef8d71c86f093776f45f57adb9
-        - name: name
-          value: buildah-oci-ta
-      params:
-      - name: IMAGE
-        value: "$(params.output-image)-spec-generator"
-      - name: DOCKERFILE
-        value: "./Containerfile"
-      - name: SOURCE_ARTIFACT
-        value: $(tasks.prefetch-dependencies.results.SOURCE_ARTIFACT)
-    
-    - name: generate-spec-file
-      runAfter: [build-spec-generator-image]
-      when:
-      - input: $(tasks.init.results.build)
-        operator: in
-        values: ["true"]
-      taskSpec:
-        params:
-        - name: generator-image-url
-        - name: argo-cd-url
-        - name: redis-url
-        - name: source-commit
-        - name: source-url
-        workspaces:
-        - name: source
-        steps:
-        - name: run-generator
-          image: $(params.generator-image-url)
-          workingDir: $(workspaces.source.path)
-          script: |
-            #!/bin/bash
-            set -euxo pipefail
-            
-            echo "Extracting source code from artifact..."
-            cp -R /src/. .
-            echo "Workspace contents:"
-            ls -laR
-            
-            export ARGO_CD_IMAGE_URL_WITH_TAG="$(params.argo-cd-url)"
-            export REDIS_IMAGE_URL_WITH_TAG="$(params.redis-url)"
-            export CI_ARGO_CD_UPSTREAM_COMMIT="$(params.source-commit)"
-            export CI_ARGO_CD_UPSTREAM_URL="$(params.source-url)"
-            
-            ./scripts/generate-spec.sh
-      params:
-      - name: generator-image-url
-        value: $(tasks.build-spec-generator-image.results.IMAGE_URL)
-      - name: argo-cd-url
-        value: $(params.argo-cd-url)
-      - name: redis-url
-        value: $(params.redis-url)
-      - name: source-commit
-        value: $(params.source-commit)
-      - name: source-url
-        value: $(params.source-url)
-      workspaces:
-      - name: source
-        workspace: source
-    
-    - name: verify-spec-file
-      runAfter: [generate-spec-file]
-      when:
-      - input: $(tasks.init.results.build)
-        operator: in
-        values: ["true"]
-      taskSpec:
-        workspaces:
-        - name: source
-        steps:
-        - name: show-spec-file
-          image: registry.access.redhat.com/ubi8/ubi-minimal
-          workingDir: $(workspaces.source.path)
-          script: |
-            #!/bin/bash
-            set -e
-            SPEC_FILE="microshift-gitops.spec"
-            echo "--- Verifying generated file: ${SPEC_FILE} ---"
-            if [ -f "${SPEC_FILE}" ]; then
-              echo "✅ File found. Displaying contents:"
-              cat "${SPEC_FILE}"
-            else
-              echo "❌ ERROR: File ${SPEC_FILE} not found!"
-              ls -laR
-              exit 1
-            fi
-      workspaces:
-      - name: source
-        workspace: source
+      value: main
+    - name: pathInRepo
+      value: pipeline/build-rpm-package.yaml
   workspaces:
+  - name: source
+    persistentVolumeClaim:
+      claimName: "{{pvc_name}}"
   - name: git-auth
     secret:
       secretName: '{{ git_auth_secret }}'
-  - name: source
-    volumeClaimTemplate:
-      spec:
-        accessModes: ["ReadWriteOnce"]
-        resources:
-          requests:
-            storage: 1Gi
