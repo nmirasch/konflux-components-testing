@@ -2,11 +2,12 @@
 
 set -euxo pipefail
 
-export CI_ARGO_CD_UPSTREAM_URL=https://github.com/argoproj/argo-cd
-export CI_X_VERSION=0
-export CI_Y_VERSION=0
-export CI_Z_VERSION=1
-export CI_ARGO_CD_UPSTREAM_COMMIT=f9bb3b608ee68c974ca748397598dcd6d113b121
+CI_X_VERSION=0
+CI_Y_VERSION=0
+CI_Z_VERSION=1
+CI_SPEC_RELEASE=1.0.0
+CI_ARGO_CD_UPSTREAM_URL=https://github.com/argoproj/argo-cd
+CI_ARGO_CD_UPSTREAM_COMMIT=f9bb3b608ee68c974ca748397598dcd6d113b121
 
 ARGO_CD_REPO="docker://registry.redhat.io/openshift-gitops-1/argocd-rhel9"
 ARGO_CD_TAG_PATTERN="v1.16"
@@ -46,5 +47,13 @@ sed -i "s|REPLACE_ARGO_CD_VERSION|${ARGO_CD_IMAGE_TAG}|g" microshift-gitops.spec
 
 sed -i "s|REPLACE_REDIS_CONTAINER_SHA_X86|${REDIS_IMAGE_SHA_X86}|g" microshift-gitops.spec
 sed -i "s|REPLACE_REDIS_CONTAINER_SHA_ARM|${REDIS_IMAGE_SHA_ARM}|g" microshift-gitops.spec
+
+sed -i "s|REPLACE_CI_X_VERSION|${CI_X_VERSION}|g" microshift-gitops.spec
+sed -i "s|REPLACE_CI_Y_VERSION|${CI_Y_VERSION}|g" microshift-gitops.spec
+sed -i "s|REPLACE_CI_Z_VERSION|${CI_Z_VERSION}|g" microshift-gitops.spec
+sed -i "s|REPLACE_CI_SPEC_RELEASE|${CI_SPEC_RELEASE}|g" microshift-gitops.spec
+sed -i "s|REPLACE_CI_ARGO_CD_UPSTREAM_URL|${CI_ARGO_CD_UPSTREAM_URL}|g" microshift-gitops.spec
+sed -i "s|REPLACE_CI_ARGO_CD_UPSTREAM_COMMIT|${CI_ARGO_CD_UPSTREAM_COMMIT}|g" microshift-gitops.spec
+
 
 echo "Script finished successfully."
