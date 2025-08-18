@@ -190,7 +190,7 @@ spec:
             #!/bin/bash
             set -e
             SPEC_FILE="microshift-gitops.spec"
-            echo "--- Verifying generated file: ${SPEC_FILE} ---"
+            echo "--- Verifying generated file : ${SPEC_FILE} ---"
             if [ -f "${SPEC_FILE}" ]; then
               echo "✅ File found. Displaying contents:"
               cat "${SPEC_FILE}"
