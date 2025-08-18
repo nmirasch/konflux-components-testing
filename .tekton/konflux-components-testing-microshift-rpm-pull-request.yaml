@@ -212,5 +212,9 @@ spec:
     secret:
       secretName: '{{ git_auth_secret }}'
   - name: source
-    persistentVolumeClaim:
-      claimName: "{{pvc_name}}"
+    volumeClaimTemplate:
+      spec:
+        accessModes: ["ReadWriteOnce"]
+        resources:
+          requests:
+            storage: 1Gi
