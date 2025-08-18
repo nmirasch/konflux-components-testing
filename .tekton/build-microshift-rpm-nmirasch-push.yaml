@@ -21,7 +21,7 @@ spec:
   - name: output-image
     value: quay.io/redhat-user-workloads/rh-openshift-gitops-tenant/build-microshift-rpm-nmirasch:{{revision}}
   - name: argo-cd-url
-    value: "registry.redhat.io/openshift-gitops-1/argocd-rhel9:v1.10"
+    value: "registry.redhat.io/openshift-gitops-1/argocd-rhel9:v1.16"
   - name: redis-url
     value: "registry.redhat.io/rhel9/redis-6:6.2"
   - name: source-commit
