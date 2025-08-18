@@ -2,6 +2,12 @@
 
 set -euxo pipefail
 
+export CI_ARGO_CD_UPSTREAM_URL=https://github.com/argoproj/argo-cd
+export CI_X_VERSION=0
+export CI_Y_VERSION=0
+export CI_Z_VERSION=1
+export CI_ARGO_CD_UPSTREAM_COMMIT=f9bb3b608ee68c974ca748397598dcd6d113b121
+
 ARGO_CD_REPO="docker://registry.redhat.io/openshift-gitops-1/argocd-rhel9"
 ARGO_CD_TAG_PATTERN="v1.16"
 
