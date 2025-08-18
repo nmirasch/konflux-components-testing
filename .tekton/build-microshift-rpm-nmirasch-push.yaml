@@ -192,7 +192,7 @@ spec:
             SPEC_FILE="microshift-gitops.spec"
             echo "--- Verifying generated file : ${SPEC_FILE} ---"
             if [ -f "${SPEC_FILE}" ]; then
-              echo "✅ File found. Displaying contents :"
+              echo "✅ File found. Displaying contents:"
               cat "${SPEC_FILE}"
             else
               echo "❌ ERROR: File ${SPEC_FILE} not found!"
