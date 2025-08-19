@@ -14,7 +14,7 @@ set -euxo pipefail
 
 # ARGO-CD variables
 # These define the component and version we are looking for.
-GITOPS_VERSION="1.16"
+GITOPS_VERSION="1.17"
 GITOPS_REGISTRY="registry.redhat.io"
 GITOPS_IMAGE_NAME="openshift-gitops-1/argocd-rhel9"
 GITOPS_TAG_PREFIX="v${GITOPS_VERSION}"
@@ -22,7 +22,7 @@ GITOPS_TAG_PREFIX="v${GITOPS_VERSION}"
 # REDIS variables
 # These define the component and version for Redis.
 REDIS_REGISTRY="registry.redhat.io"
-REDIS_IMAGE_NAME="rhel9/redis-6"
+REDIS_IMAGE_NAME="rhel9/redis-7"
 REDIS_TAG_PREFIX="9.6"
 
 CI_X_VERSION=0
