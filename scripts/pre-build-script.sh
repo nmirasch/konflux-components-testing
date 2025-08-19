@@ -29,9 +29,9 @@ CI_X_VERSION=0
 CI_Y_VERSION=0
 CI_Z_VERSION=1
 CI_SPEC_RELEASE=1.0.0
-CI_ARGO_CD_UPSTREAM_URL=https://github.com/argoproj/argo-cd/archive/refs/tags/v3.1.0.tar.gzsource_dirhttps://github.com/argoproj/argo-cd
-CI_ARGO_CD_UPSTREAM_COMMIT=f9bb3b608ee68c974ca748397598dcd6d113b121
-
+CI_ARGO_CD_UPSTREAM_URL=https://github.com/argoproj/argo-cd
+CI_ARGO_CD_UPSTREAM_COMMIT=f03c4ad854c1e6d922a121cd40f505d9bc6e402da
+#https://github.com/argoproj/argo-cd/archive/refs/tags/v3.1.0.tar.gz
 
 # --- ARGOCD build steps ---
 
@@ -51,13 +51,15 @@ ARGO_CD_FULL_IMAGE_REF="docker://${ARGO_CD_IMAGE_URL}:${ARGO_CD_IMAGE_TAG}"
 ARGO_CD_IMAGE_SHA_X86=$(skopeo inspect --raw "${ARGO_CD_FULL_IMAGE_REF}" | jq -r '.manifests[] | select(.platform.architecture=="amd64") | .digest')
 ARGO_CD_IMAGE_SHA_ARM=$(skopeo inspect --raw "${ARGO_CD_FULL_IMAGE_REF}" | jq -r '.manifests[] | select(.platform.architecture=="arm64") | .digest')
 
+cat microshift-gitops.spec.in > microshift-gitops.spec
+
 echo "Argo CD SHA (x86_64): ${ARGO_CD_IMAGE_SHA_X86}"
 echo "Argo CD SHA (aarch64): ${ARGO_CD_IMAGE_SHA_ARM}"
 
 # Update the placeholder variables in the spec template file.
-sed -i "s|REPLACE_ARGO_CD_CONTAINER_SHA_X86|${ARGO_CD_IMAGE_SHA_X86}|g" microshift-gitops.spec.in
-sed -i "s|REPLACE_ARGO_CD_CONTAINER_SHA_ARM|${ARGO_CD_IMAGE_SHA_ARM}|g" microshift-gitops.spec.in
-sed -i "s|REPLACE_ARGO_CD_VERSION|${ARGO_CD_IMAGE_TAG}|g" microshift-gitops.spec.in
+#sed -i "s|REPLACE_ARGO_CD_CONTAINER_SHA_X86|${ARGO_CD_IMAGE_SHA_X86}|g" microshift-gitops.spec.in
+#sed -i "s|REPLACE_ARGO_CD_CONTAINER_SHA_ARM|${ARGO_CD_IMAGE_SHA_ARM}|g" microshift-gitops.spec.in
+#sed -i "s|REPLACE_ARGO_CD_VERSION|${ARGO_CD_IMAGE_TAG}|g" microshift-gitops.spec.in
 
 # Also update the final spec file directly. This is because the template
 # might be processed before this script runs in some build environments.
@@ -87,11 +89,19 @@ echo "Redis SHA (x86_64): ${REDIS_IMAGE_SHA_X86}"
 echo "Redis SHA (aarch64): ${REDIS_IMAGE_SHA_ARM}"
 
 # Update the placeholder variables in the spec template file.
-sed -i "s|REPLACE_REDIS_CONTAINER_SHA_X86|${REDIS_IMAGE_SHA_X86}|g" microshift-gitops.spec.in
-sed -i "s|REPLACE_REDIS_CONTAINER_SHA_ARM|${REDIS_IMAGE_SHA_ARM}|g" microshift-gitops.spec.in
+#sed -i "s|REPLACE_REDIS_CONTAINER_SHA_X86|${REDIS_IMAGE_SHA_X86}|g" microshift-gitops.spec.in
+#sed -i "s|REPLACE_REDIS_CONTAINER_SHA_ARM|${REDIS_IMAGE_SHA_ARM}|g" microshift-gitops.spec.in
 
 # Also update the final spec file directly.
 sed -i "s|REPLACE_REDIS_CONTAINER_SHA_X86|${REDIS_IMAGE_SHA_X86}|g" microshift-gitops.spec
 sed -i "s|REPLACE_REDIS_CONTAINER_SHA_ARM|${REDIS_IMAGE_SHA_ARM}|g" microshift-gitops.spec
+
+
+sed -i "s|REPLACE_CI_X_VERSION|${CI_X_VERSION}|g" microshift-gitops.spec
+sed -i "s|REPLACE_CI_Y_VERSION|${CI_Y_VERSION}|g" microshift-gitops.spec
+sed -i "s|REPLACE_CI_Z_VERSION|${CI_Z_VERSION}|g" microshift-gitops.spec
+sed -i "s|REPLACE_CI_SPEC_RELEASE|${CI_SPEC_RELEASE}|g" microshift-gitops.spec
+sed -i "s|REPLACE_CI_ARGO_CD_UPSTREAM_URL|${CI_ARGO_CD_UPSTREAM_URL}|g" microshift-gitops.spec
+sed -i "s|REPLACE_CI_ARGO_CD_UPSTREAM_COMMIT|${CI_ARGO_CD_UPSTREAM_COMMIT}|g" microshift-gitops.spec
 
 echo "Spec files updated successfully."

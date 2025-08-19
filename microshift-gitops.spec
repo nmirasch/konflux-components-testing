@@ -5,9 +5,9 @@
 %global product_name OpenShift GitOps (ArgoCD) components for MicroShift
 %global microshift_gitops_version 0.0.1
 %global microshift_gitops_release %(echo 1.0.0 | sed -e s/rhel-9-//g)
-%global commitid f9bb3b608ee68c974ca748397598dcd6d113b121
+%global commitid f03c4ad854c1e6d922a121cd40f505d9bc6e402da
 %global source_dir argo-cd-%{commitid}
-%global source_tar argo-cd-f9bb3b608ee68c974ca748397598dcd6d113b121.tar.gz
+%global source_tar argo-cd-f03c4ad854c1e6d922a121cd40f505d9bc6e402da.tar.gz
 
 Name:           %{package_name}
 Version:        %{microshift_gitops_version}
