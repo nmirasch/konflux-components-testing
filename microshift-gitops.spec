@@ -14,7 +14,7 @@ Version:        %{microshift_gitops_version}
 Release:        %{microshift_gitops_release}%{?dist}
 Summary:        The %{product_name} package provides the required kustomize manifests for the OpenShift GitOps (ArgoCD) components to be installed on MicroShift.
 License:        ASL 2.0
-URL:            https://github.com/argoproj/argo-cd/archive/refs/tags/commit/%{commitid}
+URL:            https://github.com/argoproj/argo-cd/commit/%{commitid}
 
 Source0:        %{source_tar}
 BuildRequires:  sed
