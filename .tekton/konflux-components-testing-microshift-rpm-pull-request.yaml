@@ -32,7 +32,9 @@ spec:
   - name: hermetic
     value: "true"
   - name: build-architectures
-    value: '[aarch64, x86_64]'
+    value:
+    - aarch64
+    - x86_64
   pipelineRef:
     resolver: git
     params:
