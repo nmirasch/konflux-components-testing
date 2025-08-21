@@ -109,7 +109,7 @@ images:
     digest: "sha256:e9f89c838a37794fe47d6aa5496f9db2d604e38ed51193e236191dbff0e41c92"
   - name: redis
     newName: registry.redhat.io/rhel9/redis-6
-    digest: "sha256:a1e6862451ac5ff6f984b9abcc31e559de6a73fa7317529306ff345110d443f3"
+    digest: "sha256:4661788ee87c856884d06c150a24193eb2a5fea259b8dd0af5a08e242784577e"
 EOF
 %endif
 
@@ -121,7 +121,7 @@ images:
     digest: "sha256:78c0715198d0d9dc8f4fc25197423412eabd5fd4d82151a41f3568a74c4e7317"
   - name: redis
     newName: registry.redhat.io/rhel9/redis-6
-    digest: "sha256:f981126cc18ea1feaca610818cb878ba2be39edb33a3f24ddfa2926f9d27b71e"
+    digest: "sha256:503c0084d29177022f388cdf847532114ed81127ee579cfd0d800beca0a71703"
 EOF
 %endif
 
@@ -134,7 +134,7 @@ cat <<EOF >"microshift-assets/release-gitops-arm64.json"
   },
   "images": {
     "openshift-gitops-argocd": "registry.redhat.io/openshift-gitops-1/argocd-rhel9@sha256:e9f89c838a37794fe47d6aa5496f9db2d604e38ed51193e236191dbff0e41c92",
-    "redis": "registry.redhat.io/rhel9/redis-6@sha256:a1e6862451ac5ff6f984b9abcc31e559de6a73fa7317529306ff345110d443f3"
+    "redis": "registry.redhat.io/rhel9/redis-6@sha256:4661788ee87c856884d06c150a24193eb2a5fea259b8dd0af5a08e242784577e"
   }
 }
 EOF
@@ -146,7 +146,7 @@ cat <<EOF >"microshift-assets/release-gitops-x86_64.json"
   },
   "images": {
     "openshift-gitops-argocd": "registry.redhat.io/openshift-gitops-1/argocd-rhel9@sha256:78c0715198d0d9dc8f4fc25197423412eabd5fd4d82151a41f3568a74c4e7317",
-    "redis": "registry.redhat.io/rhel9/redis-6@sha256:f981126cc18ea1feaca610818cb878ba2be39edb33a3f24ddfa2926f9d27b71e"
+    "redis": "registry.redhat.io/rhel9/redis-6@sha256:503c0084d29177022f388cdf847532114ed81127ee579cfd0d800beca0a71703"
   }
 }
 EOF
