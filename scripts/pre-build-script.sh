@@ -31,8 +31,7 @@ CI_Z_VERSION=1
 CI_SPEC_RELEASE=1.0.0
 CI_ARGO_CD_UPSTREAM_URL=https://github.com/argoproj/argo-cd
 CI_ARGO_CD_UPSTREAM_COMMIT=2.14.15
-
-#https://github.com/argoproj/argo-cd/archive/refs/tags/v3.1.0.tar.gz
+CI_ARGO_CD_UPSTREAM_TAG=2.14.15
 
 # --- ARGOCD build steps ---
 
