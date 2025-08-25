@@ -102,6 +102,6 @@ sed -i "s|REPLACE_CI_Y_VERSION|${CI_Y_VERSION}|g" microshift-gitops.spec
 sed -i "s|REPLACE_CI_Z_VERSION|${CI_Z_VERSION}|g" microshift-gitops.spec
 sed -i "s|REPLACE_CI_SPEC_RELEASE|${CI_SPEC_RELEASE}|g" microshift-gitops.spec
 sed -i "s|REPLACE_CI_ARGO_CD_UPSTREAM_URL|${CI_ARGO_CD_UPSTREAM_URL}|g" microshift-gitops.spec
-sed -i "s|REPLACE_CI_ARGO_CD_UPSTREAM_COMMIT|${CI_ARGO_CD_UPSTREAM_COMMIT}|g" microshift-gitops.spec
+sed -i "s|REPLACE_CI_ARGO_CD_UPSTREAM_TAG|${CI_ARGO_CD_UPSTREAM_TAG}|g" microshift-gitops.spec
 
 echo "Spec files updated successfully."

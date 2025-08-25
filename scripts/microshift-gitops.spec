@@ -5,7 +5,7 @@
 %global product_name OpenShift GitOps (ArgoCD) components for MicroShift
 %global microshift_gitops_version 0.0.1
 %global microshift_gitops_release %(echo 1.0.0 | sed -e s/rhel-9-//g)
-%global argocdtag REPLACE_CI_ARGO_CD_UPSTREAM_TAG
+%global argocdtag 2.14.15
 %global source_dir argo-cd-%{argocdtag}
 %global source_tar https://github.com/argoproj/argo-cd/archive/refs/tags/v%{argocdtag}.tar.gz
 
