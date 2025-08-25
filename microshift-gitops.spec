@@ -18,6 +18,8 @@ URL:            https://github.com/argoproj/argo-cd/releases/tag/v{argocdtag}
 
 Source0:        %{source_tar}
 BuildRequires:  sed
+BuildRequires:  gcc
+BuildRequires:  gnupg2
 Provides:       %{package_name}
 Obsoletes:      %{package_name}
 Requires:       microshift >= 4.14
@@ -37,6 +39,7 @@ An example of such osbuilder blueprints for x86_64 and aarch64 platforms are
 also included in the package.
 
 %prep
+%{gpgverify}  --data='%{SOURCE0}'
 %setup -q -n %{source_dir}
 
 %build
