@@ -6,8 +6,9 @@
 %global microshift_gitops_version 0.0.1
 %global microshift_gitops_release %(echo 1.0.0 | sed -e s/rhel-9-//g)
 %global argocdtag 2.14.15
-%global source_dir argo-cd-%{argocdtag}
-%global source_tar https://github.com/argoproj/argo-cd/archive/refs/tags/v%{argocdtag}.tar.gz
+#%global source_dir argo-cd-%{argocdtag}
+%global source_dir argo-cd
+#%global source_tar https://github.com/argoproj/argo-cd/archive/refs/tags/v%{argocdtag}.tar.gz
 
 Name:           %{package_name}
 Version:        %{microshift_gitops_version}
@@ -16,7 +17,7 @@ Summary:        The %{product_name} package provides the required kustomize mani
 License:        ASL 2.0
 URL:            https://github.com/argoproj/argo-cd/releases/tag/v{argocdtag}
 
-Source0:        %{source_tar}
+#Source0:        %{source_tar}
 BuildRequires:  sed
 BuildRequires:  gcc
 BuildRequires:  gnupg2
@@ -39,9 +40,8 @@ An example of such osbuilder blueprints for x86_64 and aarch64 platforms are
 also included in the package.
 
 %prep
-%{gpgverify}  --data='%{SOURCE0}'
 %setup -q -n %{source_dir}
-
+cp -r %{_sourcedir}/* %{_builddir}/%{name}-%{version}/
 %build
 
 # Remove runAsUser property set in redis deployment as it causes deployments in microshift to fail security constratint context (SCC)
