@@ -37,7 +37,6 @@ An example of such osbuilder blueprints for x86_64 and aarch64 platforms are
 also included in the package.
 
 %prep
-mv sources sources.d
 %setup -q -n %{source_dir}
 
 %build
