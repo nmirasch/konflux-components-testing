@@ -16,7 +16,7 @@ Summary:        The %{product_name} package provides the required kustomize mani
 License:        ASL 2.0
 URL:            https://github.com/argoproj/argo-cd
 
-Source0:        https://github.com/argoproj/argo-cd/releases/tag/v{source_tar}
+Source0:        https://github.com/argoproj/argo-cd/releases/tag/v%{source_tar}
 BuildRequires:  sed
 Provides:       %{package_name}
 Obsoletes:      %{package_name}
