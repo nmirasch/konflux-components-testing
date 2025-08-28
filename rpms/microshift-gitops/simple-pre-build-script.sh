@@ -22,6 +22,7 @@ ARGO_CD_IMAGE_SHA_ARM='sha256:8168018c4ffadcda01fea61ec2bf005b556a28966dfdf60cf9
 sed -i "s/REPLACE_ARGO_CD_CONTAINER_SHA_X86/${ARGO_CD_IMAGE_SHA_X86}/g" microshift-gitops.spec
 sed -i "s/REPLACE_ARGO_CD_CONTAINER_SHA_ARM/${ARGO_CD_IMAGE_SHA_ARM}/g" microshift-gitops.spec
 sed -i "s/REPLACE_ARGO_CD_VERSION/${ARGO_CD_IMAGE_TAG}/g" microshift-gitops.spec
+sed -i "s|REPLACE_ARGO_CD_IMAGE_URL|${ARGO_CD_IMAGE_URL}|g" microshift-gitops.spec
 
 # REDIS build steps
 
@@ -36,6 +37,7 @@ REDIS_IMAGE_SHA_ARM='sha256:c796538bad7613deb1fba2bb76e736a6376b25ab97b2f944e67a
 # Update spec file too, as the file generation from the template spec.in file is run prior to the pre-build-script execution.
 sed -i "s/REPLACE_REDIS_CONTAINER_SHA_X86/${REDIS_IMAGE_SHA_X86}/g" microshift-gitops.spec
 sed -i "s/REPLACE_REDIS_CONTAINER_SHA_ARM/${REDIS_IMAGE_SHA_ARM}/g" microshift-gitops.spec
+sed -i "s|REPLACE_REDIS_IMAGE_URL|${REDIS_IMAGE_URL}|g" microshift-gitops.spec
 
 CI_X_VERSION=0
 CI_Y_VERSION=0
