@@ -106,10 +106,10 @@ cat <<EOF >>"manifests/microshift-gitops/kustomization.yaml"
 images:
   - name: quay.io/argoproj/argocd
     newName: registry.redhat.io/openshift-gitops-1/argocd-rhel9
-    digest: "REPLACE_ARGO_CD_CONTAINER_SHA_ARM"
+    digest: "sha256:8168018c4ffadcda01fea61ec2bf005b556a28966dfdf60cf922a37392bcc987"
   - name: redis
-    newName: registry.redhat.io/rhel9/redis-6
-    digest: "REPLACE_REDIS_CONTAINER_SHA_ARM"
+    newName: registry.redhat.io/rhel9/redis-7
+    digest: "sha256:c796538bad7613deb1fba2bb76e736a6376b25ab97b2f944e67af00e01f5d965"
 EOF
 %endif
 
@@ -118,10 +118,10 @@ cat <<EOF >>"manifests/microshift-gitops/kustomization.yaml"
 images:
   - name: quay.io/argoproj/argocd
     newName: registry.redhat.io/openshift-gitops-1/argocd-rhel9
-    digest: "REPLACE_ARGO_CD_CONTAINER_SHA_X86"
+    digest: "sha256:5f35a4ed723fa364bd58bc56a9491915ec8bed256a056b07429e1957580b1c4f"
   - name: redis
-    newName: registry.redhat.io/rhel9/redis-6
-    digest: "REPLACE_REDIS_CONTAINER_SHA_X86"
+    newName: registry.redhat.io/rhel9/redis-7
+    digest: "sha256:300c0fd54f8f49eba19e6a16745fa7e225f1f66b571c8e02cd098ef45e03d1c8"
 EOF
 %endif
 
@@ -130,11 +130,11 @@ mkdir -p "microshift-assets"
 cat <<EOF >"microshift-assets/release-gitops-arm64.json"
 {
   "release": {
-    "base": "REPLACE_ARGO_CD_VERSION"
+    "base": "v1.17.0-5"
   },
   "images": {
-    "openshift-gitops-argocd": "registry.redhat.io/openshift-gitops-1/argocd-rhel9@REPLACE_ARGO_CD_CONTAINER_SHA_ARM",
-    "redis": "registry.redhat.io/rhel9/redis-6@REPLACE_REDIS_CONTAINER_SHA_ARM"
+    "openshift-gitops-argocd": "registry.redhat.io/openshift-gitops-1/argocd-rhel9@sha256:8168018c4ffadcda01fea61ec2bf005b556a28966dfdf60cf922a37392bcc987",
+    "redis": "registry.redhat.io/rhel9/redis-7@sha256:c796538bad7613deb1fba2bb76e736a6376b25ab97b2f944e67af00e01f5d965"
   }
 }
 EOF
@@ -142,11 +142,11 @@ EOF
 cat <<EOF >"microshift-assets/release-gitops-x86_64.json"
 {
   "release": {
-    "base": "REPLACE_ARGO_CD_VERSION"
+    "base": "v1.17.0-5"
   },
   "images": {
-    "openshift-gitops-argocd": "registry.redhat.io/openshift-gitops-1/argocd-rhel9@REPLACE_ARGO_CD_CONTAINER_SHA_X86",
-    "redis": "registry.redhat.io/rhel9/redis-6@REPLACE_REDIS_CONTAINER_SHA_X86"
+    "openshift-gitops-argocd": "registry.redhat.io/openshift-gitops-1/argocd-rhel9@sha256:5f35a4ed723fa364bd58bc56a9491915ec8bed256a056b07429e1957580b1c4f",
+    "redis": "registry.redhat.io/rhel9/redis-7@sha256:300c0fd54f8f49eba19e6a16745fa7e225f1f66b571c8e02cd098ef45e03d1c8"
   }
 }
 EOF
