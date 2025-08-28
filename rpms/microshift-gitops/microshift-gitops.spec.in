@@ -7,7 +7,7 @@
 %global microshift_gitops_release %(echo REPLACE_CI_SPEC_RELEASE | sed -e s/rhel-9-//g)
 %global argocdtag REPLACE_CI_ARGO_CD_UPSTREAM_TAG
 %global source_dir argo-cd-%{argocdtag}
-%global source_tar argo-cd-%{argocdtag}.tar.gz
+%global source_tar argo-cd-sources.tar.gz
 
 Name:           %{package_name}
 Version:        %{microshift_gitops_version}
