@@ -3,8 +3,8 @@
 
 %global package_name microshift-gitops
 %global product_name OpenShift GitOps (ArgoCD) components for MicroShift
-%global microshift_gitops_version 1.17.0-5
-%global microshift_gitops_release %(echo 1.17.0 | sed -e s/rhel-9-//g)
+%global microshift_gitops_version 0.0.17
+%global microshift_gitops_release %(echo 1.0.0 | sed -e s/rhel-9-//g)
 %global argocdtag 3.0.12
 %global source_dir argo-cd-%{argocdtag}
 %global source_tar argo-cd-sources.tar.gz
@@ -109,7 +109,7 @@ images:
     digest: "sha256:8168018c4ffadcda01fea61ec2bf005b556a28966dfdf60cf922a37392bcc987"
   - name: redis
     newName: registry.redhat.io/rhel9/redis-7
-    digest: "sha256:c796538bad7613deb1fba2bb76e736a6376b25ab97b2f944e67af00e01f5d965"
+    digest: "sha256:27c751346f8f5ae2f67ed29d531f4ba83aabd2d90e8d18ec44b0161359c578de"
 EOF
 %endif
 
@@ -121,7 +121,7 @@ images:
     digest: "sha256:5f35a4ed723fa364bd58bc56a9491915ec8bed256a056b07429e1957580b1c4f"
   - name: redis
     newName: registry.redhat.io/rhel9/redis-7
-    digest: "sha256:300c0fd54f8f49eba19e6a16745fa7e225f1f66b571c8e02cd098ef45e03d1c8"
+    digest: "sha256:ce983d2d6f4ee792e30658fd378c4a06d76b08b7ee524e05f5cbae28d7ea3dfa"
 EOF
 %endif
 
@@ -134,7 +134,7 @@ cat <<EOF >"microshift-assets/release-gitops-arm64.json"
   },
   "images": {
     "openshift-gitops-argocd": "registry.redhat.io/openshift-gitops-1/argocd-rhel9@sha256:8168018c4ffadcda01fea61ec2bf005b556a28966dfdf60cf922a37392bcc987",
-    "redis": "registry.redhat.io/rhel9/redis-7@sha256:c796538bad7613deb1fba2bb76e736a6376b25ab97b2f944e67af00e01f5d965"
+    "redis": "registry.redhat.io/rhel9/redis-7@sha256:27c751346f8f5ae2f67ed29d531f4ba83aabd2d90e8d18ec44b0161359c578de"
   }
 }
 EOF
@@ -146,7 +146,7 @@ cat <<EOF >"microshift-assets/release-gitops-x86_64.json"
   },
   "images": {
     "openshift-gitops-argocd": "registry.redhat.io/openshift-gitops-1/argocd-rhel9@sha256:5f35a4ed723fa364bd58bc56a9491915ec8bed256a056b07429e1957580b1c4f",
-    "redis": "registry.redhat.io/rhel9/redis-7@sha256:300c0fd54f8f49eba19e6a16745fa7e225f1f66b571c8e02cd098ef45e03d1c8"
+    "redis": "registry.redhat.io/rhel9/redis-7@sha256:ce983d2d6f4ee792e30658fd378c4a06d76b08b7ee524e05f5cbae28d7ea3dfa"
   }
 }
 EOF
