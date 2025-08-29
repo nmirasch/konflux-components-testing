@@ -14,7 +14,7 @@ set -euxo pipefail
 
 # ARGO-CD variables
 # These define the component and version we are looking for.
-GITOPS_VERSION="1.17" # "1.17.0-5"
+GITOPS_VERSION="1.17.0-5" # "1.16"
 GITOPS_REGISTRY="registry.redhat.io"
 GITOPS_IMAGE_NAME="openshift-gitops-1/argocd-rhel9"
 GITOPS_TAG_PREFIX="v${GITOPS_VERSION}"
@@ -22,13 +22,13 @@ GITOPS_TAG_PREFIX="v${GITOPS_VERSION}"
 # REDIS variables
 # These define the component and version for Redis.
 REDIS_REGISTRY="registry.redhat.io"
-REDIS_IMAGE_NAME="rhel9/redis-7" #"rhel9/redis-7"
-REDIS_TAG_PREFIX="9.6"
+REDIS_IMAGE_NAME="rhel9/redis-7" #"rhel9/redis-6"
+REDIS_TAG_PREFIX="9.6-1755009825" # "rhel-9.3.0-container-released"
 
-CI_X_VERSION=0
-CI_Y_VERSION=0
-CI_Z_VERSION=17
-CI_SPEC_RELEASE=1.0.0
+CI_X_VERSION=1
+CI_Y_VERSION=17
+CI_Z_VERSION=0-5
+CI_SPEC_RELEASE=1.17.0-5
 CI_ARGO_CD_UPSTREAM_URL=https://github.com/argoproj/argo-cd
 CI_ARGO_CD_UPSTREAM_TAG=3.0.12 #2.14.15 #3.0.12
 
