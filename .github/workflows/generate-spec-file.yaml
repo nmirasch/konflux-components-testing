@@ -28,22 +28,10 @@ on:
         description: 'Redis tag prefix to search for'
         required: true
         default: '9.6-1755009825'
-      ci_x_version:
-        description: 'CI X version component'
+      gitops_release:
+        description: 'Gitops Spec Release (??= version)'
         required: true
-        default: '1'
-      ci_y_version:
-        description: 'CI Y version component'
-        required: true
-        default: '17'
-      ci_z_version:
-        description: 'CI Z version component'
-        required: true
-        default: '0'
-      ci_spec_release:
-        description: 'CI Spec Release version'
-        required: true
-        default: '1.17'
+        default: '1.17.0-5'
       ci_argo_cd_upstream_tag:
         description: 'ArgoCD upstream source tag (without v)'
         required: true
@@ -51,7 +39,7 @@ on:
       target_branch:
         description: 'The branch to create the pull request against'
         required: true
-        default: 'main'
+        default: 'GITOPS-6959_rpm_microshift-gitops_folder'
 
 jobs:
   update-spec-and-create-pr:
@@ -76,28 +64,20 @@ jobs:
         podman login registry.redhat.io -u ${{ secrets.RH_USERNAME }} -p ${{ secrets.RH_PASSWORD }}
     
     - name: Run the Pre-Build Script
-      # This step executes your script.
-      # NOTE: Assumes your script is in a directory named 'scripts'.
-      # Please adjust the 'working-directory' if your file is located elsewhere.
       id: run_script
       working-directory: ./rpms/microshift-gitops
       env:
-        # Maps the workflow inputs to the environment variables your script uses
         GITOPS_VERSION: ${{ inputs.gitops_version }}
         GITOPS_REGISTRY: ${{ inputs.gitops_registry }}
         GITOPS_IMAGE_NAME: ${{ inputs.gitops_image_name }}
         REDIS_REGISTRY: ${{ inputs.redis_registry }}
         REDIS_IMAGE_NAME: ${{ inputs.redis_image_name }}
         REDIS_TAG_PREFIX: ${{ inputs.redis_tag_prefix }}
-        CI_X_VERSION: ${{ inputs.ci_x_version }}
-        CI_Y_VERSION: ${{ inputs.ci_y_version }}
-        CI_Z_VERSION: ${{ inputs.ci_z_version }}
-        CI_SPEC_RELEASE: ${{ inputs.ci_spec_release }}
+        GITOPS_RELEASE: ${{ inputs.gitops_release }}
         CI_ARGO_CD_UPSTREAM_TAG: ${{ inputs.ci_argo_cd_upstream_tag }}
       run: ./generic-pre-build-script.sh
     
     - name: Create Pull Request
-      # This action checks for changes and creates a PR if any are found.
       uses: peter-evans/create-pull-request@v6
       with:
         token: ${{ secrets.GITHUB_TOKEN }}
