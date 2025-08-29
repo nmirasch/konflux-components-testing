@@ -3,14 +3,14 @@
 
 %global package_name microshift-gitops
 %global product_name OpenShift GitOps (ArgoCD) components for MicroShift
-%global microshift_gitops_version 1.17.0
-%global microshift_gitops_release %(echo 1.17 | sed -e s/rhel-9-//g)
+%global microshift_gitops_version 1.17.0-5
+%global microshift_gitops_release 1.17.0
 %global argocdtag 3.0.12
 %global source_dir argo-cd-%{argocdtag}
 %global source_tar argo-cd-sources.tar.gz
 
 Name:           %{package_name}
-Version:        %{microshift_gitops_version}
+Version:        %{microshift_gitops_release}
 Release:        %{microshift_gitops_release}%{?dist}
 Summary:        The %{product_name} package provides the required kustomize manifests for the OpenShift GitOps (ArgoCD) components to be installed on MicroShift.
 License:        ASL 2.0
@@ -31,7 +31,7 @@ BuildArch: noarch
 
 %description release-info
 The %{package_name}-release-info package provides release information files for this
-release. These files contain the list of container image references used by
+release %{microshift_gitops_version}. These files contain the list of container image references used by
 MicroShift GitOps and can be used to embed those images into osbuilder blueprints.
 An example of such osbuilder blueprints for x86_64 and aarch64 platforms are
 also included in the package.
