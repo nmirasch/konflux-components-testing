@@ -31,7 +31,7 @@ on:
       gitops_release:
         description: 'Gitops Spec Release (??= version)'
         required: true
-        default: '1.17.0-5'
+        default: '1.17.0'
       ci_argo_cd_upstream_tag:
         description: 'ArgoCD upstream source tag (without v)'
         required: true
