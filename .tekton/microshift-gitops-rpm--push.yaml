@@ -1,4 +1,5 @@
 apiVersion: tekton.dev/v1
+apiVersion: tekton.dev/v1
 kind: PipelineRun
 metadata:
   annotations:
@@ -8,13 +9,13 @@ metadata:
     pipelinesascode.tekton.dev/cancel-in-progress: "false"
     pipelinesascode.tekton.dev/max-keep-runs: "3"
     pipelinesascode.tekton.dev/on-cel-expression: event == "push" && target_branch
-      == "main"
+      == "release-1.17"
   creationTimestamp: null
   labels:
     appstudio.openshift.io/application: testing-rpms-builds
-    appstudio.openshift.io/component: microshift-gitops-rpm-testing-main
+    appstudio.openshift.io/component: microshift-gitops-rpm-testing-release-1-17
     pipelines.appstudio.openshift.io/type: build
-  name: microshift-gitops-rpm-testing-main-on-push
+  name: microshift-gitops-rpm-testing-release-1-17-on-push
   namespace: rh-openshift-gitops-tenant
 spec:
   params:
